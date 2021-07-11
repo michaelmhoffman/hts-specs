@@ -126,7 +126,9 @@ This document uses the following typographic conventions:
 
 \item[field separator:]
   One or more horizontal whitespace characters (space or tab).
-  The \textbf{field} separator must match the \ac{regex}~\texttt{[ {\textbackslash}]+}.
+  The \textbf{field} separator must match the \ac{regex}~\texttt{[ {\textbackslash}t]+}.
+  The field separator can vary throughout the \textbf{file}.
+  However, some capabilities of the \ac{BED} format are only available if a single tab is used as the field separator throughout the file.
 
 \item[file:]
   Sequence of one or more~\textbf{line}s.
@@ -137,7 +139,7 @@ This document uses the following typographic conventions:
   Discussed more fully in~\autoref{sec:lines}
 
 \item[line separator:]
-  Either carriage return, newline, or carriage return followed by newline\footnote{A newline is defined as `\texttt{{\textbackslash}n}'}
+  Either carriage return, newline, or carriage return followed by newline\footnote{A newline is defined as `\texttt{{\textbackslash}n}'. A carriage return is defined as `\texttt{{\textbackslash}r}'.}
   The same \textbf{line separator} must be used throughout the \textbf{file}.
 \end{description}
 
@@ -163,7 +165,7 @@ They may appear in any quantity.
 
 Each~\textbf{data line} contains between~3 and 12~~\textbf{field}s delimited by a \textbf{field separator}.
 The first 3~\textbf{field}s are mandatory, and the last 9~\textbf{field}s are optional.
-In optional~\textbf{field}s, the order is binding---if 1~\textbf{field} is filled, then all previous~\textbf{field}s must also be filled.
+In optional~\textbf{field}s, the order is binding---if a \textbf{field} is filled, then all previous~\textbf{field}s must also be filled.
 However, \textbf{BED10} and \textbf{BED11} are prohibited.
 
 In a \ac{BED}~\textbf{file}, each~\textbf{data line} must have the same number of~\textbf{field}s.
@@ -198,11 +200,11 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
 \subsection{Coordinates}
 \begin{enumerate}
 \item \textsf{chrom}: The name of the~\textbf{chromosome} where the~\textbf{feature} is present.
-  Limiting only to word characters only, instead of all non-whitespace characters, makes \ac{BED}~\textbf{file}s more portable to varying environments which may make different assumptions about allowed characters.
+  Limiting to word characters only, instead of all non-whitespace characters, makes \ac{BED}~\textbf{file}s more portable to varying environments which may make different assumptions about allowed characters.
   The name must be between~1 and 255~characters long, inclusive.
 
 \item \textsf{chromStart}: Start position of the~\textbf{feature} on the~\textbf{chromosome}.
-  \textsf{chromStart}~must be an integer greater than or equal to~0 and less than the total number of bases of the~\textbf{chromosome} to which it belongs.
+  \textsf{chromStart}~must be an integer greater than or equal to~0 and less than or equal to the total number of bases of the~\textbf{chromosome} to which it belongs.
   If the size of the~\textbf{chromosome} is unknown, then \textsf{chromStart}~must be less than or equal to~$2^{64} - 1$, which is the maximum size of an unsigned 64-bit integer.
 
 \item \textsf{chromEnd}: End position of the~\textbf{feature} on the~\textbf{chromosome}.
@@ -229,7 +231,7 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
   The \textsf{strand} may either refer to the~\texttt{+}~(sense or coding) strand or the~\texttt{-}~(antisense or complementary) strand.
   If the~\textbf{feature} has no \textsf{strand} information or unknown \textsf{strand}, then a dot~(\texttt{.}) must be used as a default value.
   \textsf{strand} cannot be empty in \textbf{BED6+} \textbf{file}s.
-  A parser should treat \textbf{files} that are not \textbf{BED6+} as if \textsf{strand} were \texttt{.}.
+  \textsf{Strand} should be treated as \texttt{.} when parsing files that are not \textbf{BED6+}.
 \end{enumerate}
 
 \subsection{Display attributes}
@@ -251,6 +253,7 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
   The triple is three integers separated by commas.
   Each integer is between~0 and~255, inclusive.
   To make a~\textbf{feature} black, \textsf{itemRgb}~may be a single~\texttt{0}, which is visualized identically to a~\textbf{feature} with \textsf{itemRgb} of \texttt{0,0,0}.
+  An \textsf{itemRgb} of 0 is a special case and no other single-number value is valid.
 \end{enumerate}
 
 \subsection{Blocks}
@@ -323,7 +326,7 @@ The last~\textbf{block} ends at~\textsf{chromEnd} since the last~\textbf{block} 
 
 \subsection{Optional fields}\label{sec:optional}
 \begin{itemize}
-\item \textsf{name}: If a \textbf{feature} has no name, then a dot~(\texttt{.}) should be used.
+\item \textsf{name}: In the absence of out-of-band information about whether a single tab is the only \textbf{field separator} in the file, if a \textbf{feature} has no name, then a dot~(\texttt{.}) should be used.
   Names should avoid using the space character even if the only \textbf{field separator} is a single tab character, because parsers may interpret a space as a \textbf{field separator}.
 
 \item \textsf{itemRgb}: Eight or fewer colors should be used as too many colors may slow down visualizations and are difficult for humans to distinguish.\footnote{``Frequently
@@ -363,14 +366,17 @@ The AutoSQL format\footnote{Kent, W.~James.
 \Ac{BED} \textbf{file}s should be sorted by~\textsf{chrom}, then by~\textsf{chromStart} numerically, and finally by~\textsf{chromEnd} numerically.
 \textsf{chrom} may be sorted using any scheme (such as lexicographic or numeric order), but all \textbf{data line}s with the same~\textsf{chrom} value should occur consecutively.
 For example, the lexicographic order of~\texttt{chr1}, \texttt{chr10}, \texttt{chr11}, \texttt{chr12}, {\ldots}, \texttt{chr2}, \texttt{chr20}, \texttt{chr21}, {\ldots}, \texttt{chr3}, {\ldots}, \texttt{chrX}, \texttt{chrY}, \texttt{chrM} is an acceptable sorting.
+This ordering is equivalent to sorting the \textbf{file} using the command \texttt{LC\_ALL=C~sort~-k~1,1~-k~2,2n~-k3,3n}.
 The numeric order of~\texttt{chr1}, \texttt{chr2}, {\ldots}, \texttt{chr21}, \texttt{chr22}, \texttt{chrM}, \texttt{chrX}, \texttt{chrY} is also acceptable.
 Arbitrary orderings of~\textsf{chrom} are allowed, but regardless of the \textbf{chromosome} sorting scheme, \textbf{data line}s for two \textbf{feature}s on the same \textbf{chromosome} should not have any \textbf{data line}s for \textbf{feature}s on other \textbf{chromosome}s between them.
 Multiple \textbf{feature}s that have the same~\textsf{chrom}, \textsf{chromStart}, and \textsf{chromEnd} can appear in any order.
 
+For \textbf{BED4+} files, the sorting scheme can also take the optional \textbf{field}s into account as inconsistent sorting of \ac{BED} \textbf{file}s may result in downstream analyses producing different results.
+
 \subsection{Whitespace}\label{sec:whitespace}
-Though \textbf{data line}s may use any kind of horizontal whitespace as a delimiter between~\textbf{field}s, a single tab~(\texttt{{\textbackslash}t}) should be used.
+Though \textbf{data line}s may use any kind of horizontal whitespace as a \textbf{field separator}, a single tab~(\texttt{{\textbackslash}t}) should be used.
 This is because almost all tools support tabs while some tools do not support other kinds of whitespace.
-Also, spaces within the~\textsf{name}~\textbf{field} may be used only if the \textbf{field}~delimiter is tab throughout the \textbf{file}.
+Also, spaces within the~\textsf{name}~\textbf{field} may be used only if the \textbf{field separator} is tab throughout the \textbf{file}.
 
 \subsection{Large \acs{BED} files}
 If a~\textbf{file} intended for visualization is over \SI{50}{\mebi\byte} in size, the~\textbf{file} should be converted to~\texttt{bigBed} format, which is an indexed binary format.\footnote{Kent, W.~James et al.
@@ -379,6 +385,9 @@ If a~\textbf{file} intended for visualization is over \SI{50}{\mebi\byte} in siz
   \url{https://doi.org/10.1093/bioinformatics/btq351}}
 The~\texttt{bedToBigBed} program may perform this conversion.\footnote{``bigBed Track Format.''
   \Ac{UCSC} Genome Browser FAQ, \url{https://genome.ucsc.edu/goldenPath/help/bigBed.html}}
+
+Tabix is another option for storing larger \ac{BED} \textbf{file}s.\footnote{Li H. (2011). ``Tabix: fast retrieval of sequence features from generic TAB-delimited files.'' \emph{Bioinformatics (Oxford, England)}, 27(5):718–719. \url{https://doi.org/10.1093/bioinformatics/btq671}}
+Tabix works only on \textbf{file}s using a single tab as the \textbf{field separator}.
 
 \section{Information supplied out-of-band}
 
@@ -421,7 +430,7 @@ To distinguish between \ac{BED} \textbf{file}s and track files, track files shou
 \section{Acknowledgments}
 
 We thank W.~James Kent and the \ac{UCSC} Genome Browser team for creating the \ac{BED} format.
-We thank W.~James Kent and Hiram Clawson~(\ac{UCSC}); Eric Roberts~(University Health Network); John Marshall~(University of Glasgow); Aaron R.~Quinlan and Brent S.~Pedersen~(University of Utah); Ting Wang~(Washington University in St.~Louis); Daniel Perrett and Simon Brent (Wellcome Sanger Institute); Jasper Saris (Erasmus Medical Center); Zhenyu Zhang (University of Chicago); Andrew Yates (\ac{EMBL}---European Bioinformatics Institute); and the \ac{GA4GH} File Formats Task Team for comments on this specification.
+We thank W.~James Kent and Hiram Clawson~(\ac{UCSC}); Eric Roberts~(University Health Network); John Marshall~(University of Glasgow); Aaron R.~Quinlan and Brent S.~Pedersen~(University of Utah); Ting Wang~(Washington University in St.~Louis); Daniel Perrett and Simon Brent (Wellcome Sanger Institute); Jasper Saris (Erasmus Medical Center); Zhenyu Zhang (University of Chicago); Andrew Yates (\ac{EMBL}---European Bioinformatics Institute); Michael Schatz (Johns Hopkins University); Igor Dolgalev (New York University); Colin Diesh (University of California, Berkeley); Alex Reynolds (Altius Institute for Biomedical Sciences); and the \ac{GA4GH} File Formats Task Team for comments on this specification.
 
 
 \end{document}
