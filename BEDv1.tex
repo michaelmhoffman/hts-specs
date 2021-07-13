@@ -65,7 +65,7 @@ This printing is version~\commitdesc\ from that repository, last modified on the
 
 \section{Specification}
 
-\Ac{BED} is a whitespace-delimited file format, where each~\textbf{file} consists of one or more~\textbf{line}s.\footnote{``Frequently Asked Questions: Data File Formats.'' \ac{UCSC} Genome Browser FAQ, \url{https://genome.ucsc.edu/FAQ/FAQformat.html}}
+\Ac{BED} is a whitespace-delimited file format, where each~\textbf{file} consists of zero or more~\textbf{line}s.\footnote{``Frequently Asked Questions: Data File Formats.'' \ac{UCSC} Genome Browser FAQ, \url{https://genome.ucsc.edu/FAQ/FAQformat.html}}
 Data are in~\textbf{data line}s, which describe discrete genomic~\textbf{feature}s by physical start and end position on a linear~\textbf{chromosome}.
 The file extension for the \ac{BED} format is~\texttt{.bed}.
 
@@ -81,7 +81,7 @@ This document uses the following typographic conventions:
 \vspace{2ex}
 
 \noindent
-\addstackgap[\baselineskip]{\begin{tabularx}{\textwidth}{r L L}
+\begin{tabularx}{\textwidth}{r L L}
   \toprule
   Style & Meaning & Examples \\
   \midrule
@@ -90,12 +90,12 @@ This document uses the following typographic conventions:
   Fixed-width & Literals or \ac{regex}es\footnote{POSIX/IEEE~1003.1--2017 Extended Regular Expressions, for the ``C'' locale.
                 \emph{IEEE Standard for Information Technology---Portable Operating System Interface~(POSIX) Base Specifications}, IEEE~1003.1--2017, 2017} & \texttt{.bed}{\quad}\texttt{grep}{\quad}\texttt{[[:alnum:]]+}{\quad}\texttt{ATCG} \\
   \bottomrule
-\end{tabularx}}
+\end{tabularx}
 \captionof{table}{\textbf{Typographic conventions}}
 
 \subsection{Terminology and concepts}\label{sec:terms}
 \begin{description}
-\item[0-start, half-open coordinate system:]
+\item[0-based, half-open coordinate system:]
   A coordinate system where the first base starts at position~0, and the start of the interval is included but the end is not.
   For example, for a sequence of bases~\texttt{ACTGCG}, the bases given by the interval~[2,~4) are~\texttt{TG}. % chktex 9
 
@@ -146,7 +146,10 @@ This document uses the following typographic conventions:
   Discussed more fully in~\autoref{sec:lines}
 
 \item[line separator:]
-  Either carriage return, newline, or carriage return followed by newline\footnote{A newline is defined as `\texttt{{\textbackslash}n}'. A carriage return is defined as `\texttt{{\textbackslash}r}'.}
+  Either carriage return, newline, or carriage return followed by newline.
+  A carriage return is defined as~`\texttt{{\textbackslash}r}', equivalent to~`\texttt{{\textbackslash}x0d}'.
+  A newline is defined as~`\texttt{{\textbackslash}n}', equivalent to~`\texttt{{\textbackslash}x0a}'.
+  A carriage return followed by a newline is defined as~`\texttt{{\textbackslash}r{\textbackslash}n}', equivalent to~`\texttt{{\textbackslash}x0d{\textbackslash}x0a}'
   The same \textbf{line separator} must be used throughout the \textbf{file}.
 \end{description}
 
@@ -180,7 +183,7 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
 
 \begin{adjustwidth}{-0.5in}{-0.5in}
   \noindent
-  \addstackgap[\baselineskip]{\begin{tabularx}{\linewidth}{r l l l L}
+  \begin{tabularx}{\linewidth}{r l l l L}
     \toprule
     Col & Field & Type & Regex or range & Brief description \\
     \midrule
@@ -197,7 +200,7 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
     11 & \textsf{blockSizes} & List[Int] & \texttt{([[:digit:]]+,)\{\textsf{blockCount}$-1$\}[[:digit:]]+,?}{\footnotemark} & \textbf{Block} sizes \\
     12 & \textsf{blockStarts} & List[Int] & \texttt{([[:digit:]]+,)\{\textsf{blockCount}$-1$\}[[:digit:]]+,?} & \textbf{Block} start positions \\
     \bottomrule
-  \end{tabularx}}
+  \end{tabularx}
   \footnotetext[5]{\texttt{[[:alnum:]\_]} is equivalent to the \ac{regex} \texttt{[A-Za-z0-9\_]}. % chktex 8
       It is also equivalent to the Perl extension \texttt{[[:word:]]}.}
   \footnotetext[6]{\textsf{chromEnd}-\textsf{chromStart} is the maximum number of~\textbf{block}s that may exist without overlaps.}
@@ -354,17 +357,17 @@ Definitions of a custom \ac{BED} format should restrict the type of each \textbf
 Each custom \textbf{field} should contain either one of the following data types or a comma-separated list of values of the same type, except for strings:
 
 \noindent
-\addstackgap[\baselineskip]{\begin{tabularx}{\textwidth}{r L}
+\begin{tabularx}{\textwidth}{r L}
   \toprule
   Type & Definition \\
   \midrule
-  Integer & String representation of 64-bit signed integer\footnote{\emph{IEEE 754--1985 IEEE Standard for Binary Floating-Point Arithmetic.} IEEE 754--1985, 1985} \\
-  Unsigned & String representation of 64-bit unsigned integer\footnotemark[10] \\
-  Float & String representation of 64-bit floating point number\footnotemark[10] \\
+  Integer & Textual representation of 64-bit signed integer\\
+  Unsigned & Textual representation of 64-bit unsigned integer \\
+  Float & Textual representation of 64-bit floating point number\footnote{\emph{IEEE 754--1985 IEEE Standard for Binary Floating-Point Arithmetic.} IEEE 754--1985, 1985} \\
   Character & One character, other than tab \\
   String & One or more characters, other than tab \\
   \bottomrule
-\end{tabularx}}
+\end{tabularx}
 \captionof{table}{\textbf{Custom field data types}}
 
 This specification does not contain a means for interchanging custom \ac{BED} format definitions.
@@ -410,7 +413,7 @@ Information that must be supplied out-of-band include:
 
 \begin{itemize}
     \item Which of the first~4 to 12~\textbf{fields} are standard \ac{BED} \textbf{fields} and which are custom \textbf{field}s.
-    \item The genome assembly that define \textsf{chrom}, \textsf{chromStart}, and \textsf{chromEnd}.
+    \item The genome assembly that defines \textsf{chrom}, \textsf{chromStart}, and \textsf{chromEnd}.
     \item The semantics of \textbf{fields} such as \textsf{score}, \textsf{itemRgb}, thick vs.~thin positions, and block vs.~non-block positions.
     \item The definitions of custom \textbf{field}s.
     \item Whether the \textbf{field separator} is a single tab character.
@@ -443,7 +446,7 @@ To distinguish between \ac{BED} \textbf{file}s and track files, track files shou
 \section{Acknowledgments}
 
 We thank W.~James Kent and the \ac{UCSC} Genome Browser team for creating the \ac{BED} format.
-We thank W.~James Kent and Hiram Clawson~(\ac{UCSC}); Eric Roberts~(University Health Network); John Marshall~(University of Glasgow); Aaron R.~Quinlan and Brent S.~Pedersen~(University of Utah); Ting Wang~(Washington University in St.~Louis); Daniel Perrett and Simon Brent (Wellcome Sanger Institute); Jasper Saris (Erasmus Medical Center); Zhenyu Zhang (University of Chicago); Andrew Yates (\ac{EMBL}---European Bioinformatics Institute); Michael Schatz (Johns Hopkins University); Igor Dolgalev (New York University); Colin Diesh (University of California, Berkeley); Alex Reynolds (Altius Institute for Biomedical Sciences); and the \ac{GA4GH} File Formats Task Team for comments on this specification.
+We thank W.~James Kent and Hiram Clawson~(\ac{UCSC}); Eric Roberts~(University Health Network); John Marshall~(University of Glasgow); Aaron R.~Quinlan and Brent S.~Pedersen~(University of Utah); Ting Wang~(Washington University in St.~Louis); Daniel Perrett and Simon Brent (Wellcome Sanger Institute); Jasper Saris (Erasmus Medical Center); Zhenyu Zhang (University of Chicago); Andrew Yates and Susan Fairley (\ac{EMBL}---European Bioinformatics Institute); Michael Schatz (Johns Hopkins University); Igor Dolgalev (New York University); Colin Diesh (University of California, Berkeley); Alex Reynolds (Altius Institute for Biomedical Sciences); Junjun Zhang (Ontario Institute for Cancer Research); and the \ac{GA4GH} File Formats Task Team for comments on this specification.
 
 
 \end{document}
