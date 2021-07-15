@@ -255,17 +255,19 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
 
 \item \textsf{name}: String that describes the~\textbf{feature}.
   \textsf{name} must be~1 to 255~non-tab characters.
-  \textsf{name} must not be empty or contain whitespace, unless the only \textbf{field separator} is a single tab.
+  \textsf{name} must not be empty.
+  \textsf{name} must not contain whitespace, unless the only \textbf{field separator} is a single tab.
   Multiple \textbf{data line}s may share the same \textsf{name}.
+  In \textbf{BED5+} \textbf{file}s where all \textbf{features} have uninformative \textsf{name}s, dot~(\texttt{.}) may be used as a \textsf{name} on every \textbf{data line}.
   A visual representation of the \ac{BED} format may display \textsf{name} next to the~\textbf{feature}.
 
 \item \textsf{score}: Integer between~0 and~1000, inclusive.
-  In~\textbf{BED6+} \textbf{file}s where all \textbf{feature}s have uninformative \textsf{score}s, \texttt{0} should be used as the \textsf{score} on every \textbf{data line}.
+  In \textbf{BED6+} \textbf{file}s where all \textbf{feature}s have uninformative \textsf{score}s, \texttt{0} should be used as the \textsf{score} on every \textbf{data line}.
   A visual representation of the \ac{BED} format may shade \textbf{feature}s differently depending on their \textsf{score}.
 
 \item \textsf{strand}: Strand that the~\textbf{feature} appears on.
   The \textsf{strand} may either refer to the~\texttt{+}~(sense or coding) strand or the~\texttt{-}~(antisense or complementary) strand.
-  If the~\textbf{feature} has no \textsf{strand} information or unknown \textsf{strand}, then a dot~(\texttt{.}) must be used as a default value.
+  If the \textbf{feature} has no \textsf{strand} information or unknown \textsf{strand}, then a dot~(\texttt{.}) must be used as an uninformative value.
   \textsf{strand} cannot be empty in \textbf{BED6+} \textbf{file}s.
   \textsf{strand} should be treated as \texttt{.} when parsing files that are not \textbf{BED6+}.
 \end{enumerate}
@@ -276,20 +278,21 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
 
 \item \textsf{thickStart}: Start position at which the~\textbf{feature} is visualized with a thicker or accented display.
   This value must be an integer between~\textsf{chromStart} and~\textsf{chromEnd}, inclusive.
-  The default value for~\textsf{thickStart} is the value of \textsf{chromStart}.
+  In \textbf{BED7+} \textbf{file}s where all \textbf{feature}s have uninformative \textsf{thickStart}s, the value of \textsf{chromStart} should be used as the \textsf{thickStart} on every \textbf{data line}.
 
 \item \textsf{thickEnd}: End position at which the~\textbf{feature} is visualized with a thicker or accented display.
   This value must be an integer greater than or equal to~\textsf{thickStart} and less than or equal to~\textsf{chromEnd}, inclusive.
-  In \ac{BED} \textbf{file}s with fewer than 7~\textbf{field}s, the whole~\textbf{feature} has thick display.
+  In \textbf{BED8+} \textbf{file}s where all \textbf{feature}s have uninformative \textsf{thickEnd}s, the value of \textsf{chromEnd} should be used as the \textsf{thickEnd} on every \textbf{data line}.
+  In \ac{BED} \textbf{file}s that are not \textbf{BED7+}, the whole~\textbf{feature} has thick display.
   In \textbf{BED7+}~\textbf{file}s, to achieve the same effect, set \textsf{thickStart}~equal to~\textsf{chromStart} and \textsf{thickEnd}~equal to~\textsf{chromEnd}.
   If this~\textbf{field} is not specified but \textsf{thickStart}~is, then the entire~\textbf{feature} has thick display.
-  For \textbf{BED7+} \textbf{file}s that are not \textbf{BED8+}, the default value is the value of $\textsf{chromEnd} - \textsf{chromStart}$.
 
 \item \textsf{itemRgb}: A triple of integers that determines the color of this~\textbf{feature} when visualized.
   The triple is three integers separated by commas.
   Each integer is between~0 and~255, inclusive.
   To make a~\textbf{feature} black, \textsf{itemRgb}~may be a single~\texttt{0}, which is visualized identically to a~\textbf{feature} with \textsf{itemRgb} of \texttt{0,0,0}.
   An \textsf{itemRgb} of~\texttt{0} is a special case and no other single-number value is valid.
+  In \textbf{BED9+} \textbf{file}s where all \textbf{feature}s have uninformative \textsf{itemRgb}s, \texttt{0} should be used as the \textsf{itemRgb} on every \textbf{data line}.
 \end{enumerate}
 
 \subsection{Blocks}
@@ -420,9 +423,11 @@ A recommendation for how to do this is outside the scope of this version of the 
 Total deterministic sorting of \ac{BED} \textbf{file}s can prevent downstream analyses from producing different results depending on sort order.
 
 \subsection{Whitespace}\label{sec:whitespace}
-Though \textbf{data line}s may use any kind of horizontal whitespace as a \textbf{field separator}, a single tab~(\texttt{{\textbackslash}t}) should be used.
+We recommend that only a single tab~(\texttt{{\textbackslash}t}) be used as \textbf{field separator}.
 This is because almost all tools support tabs while some tools do not support other kinds of whitespace.
 Also, spaces within the~\textsf{name}~\textbf{field} may be used only if the \textbf{field separator} is tab throughout the \textbf{file}.
+
+It would be sensible for future major versions of this specification or overlay formats built on top of this specification to require that only a single tab be used as \textbf{field separator}.
 
 \subsection{Large \acs{BED} files}
 If a~\textbf{file} intended for visualization is over \SI{50}{\mebi\byte} in size, the~\textbf{file} should be converted to~\texttt{bigBed} format, which is an indexed binary format.\footnote{Kent, W.~James et al.
