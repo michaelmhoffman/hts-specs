@@ -32,7 +32,7 @@
 
 \definecolor{cverbbg}{gray}{0.93}
 
-\title{The Browser Extensible Data~(BED) format}
+\title{The \acf{BED} format}
 \author{Jeffrey Niu, Danielle Denisko, Michael M.~Hoffman}
 \date{\headdate}
 
@@ -110,14 +110,14 @@ This document uses several typographic conventions~(\autoref{tab:typographic-con
   A coordinate system where the first base starts at position~0, and the start of the interval is included but the end is not.
   For example, for a sequence of bases~\texttt{ACTGCG}, the bases given by the interval~[2,~4) are~\texttt{TG}. % chktex 9
 
-\item[BED$n$:]
+\item[\acs{BED}$n$:]
   A~\textbf{file} with the first $n$~\textbf{field}s of the \ac{BED} format.
   For example, \textbf{BED3}~means a~\textbf{file} with only the first 3~\textbf{field}s; \textbf{BED12}~means a~\textbf{file} with all 12~\textbf{field}s.
 
-\item[BED$n$+:]
+\item[\acs{BED}$n$+:]
   A~\textbf{file} that has the first $n$~\textbf{field}s of the \ac{BED} format, followed by any number of~\textbf{field}s of custom data defined by a user.
 
-\item[BED$n$+$m$:]
+\item[\acs{BED}$n$+$m$:]
   A~\textbf{file} that has a custom format starting with the first $n$~\textbf{field}s of the \ac{BED} format, followed by $m$~\textbf{field}s of custom data defined by a user.
   For example, \textbf{BED6+4}~means a~\textbf{file} with the first 6~\textbf{field}s of the \ac{BED} format, followed by 4~user-defined~\textbf{field}s.
 
@@ -157,7 +157,7 @@ This document uses several typographic conventions~(\autoref{tab:typographic-con
   Discussed more fully in~\autoref{sec:lines}
 
 \item[line separator:]
-  Either carriage return~(\texttt{{\textbackslash}r}, equivalent to \texttt{{\textbackslash}x0d}, newline~(\texttt{{\textbackslash}r}, equivalent to \texttt{{\textbackslash}x0a}), or carriage return followed by newline (\texttt{{\textbackslash}r{\textbackslash}n}, equivalent to \texttt{{\textbackslash}x0d{\textbackslash}x0a}).
+  Either carriage return~(\texttt{{\textbackslash}r}, equivalent to \texttt{{\textbackslash}x0d}), newline~(\texttt{{\textbackslash}r}, equivalent to \texttt{{\textbackslash}x0a}), or carriage return followed by newline~(\texttt{{\textbackslash}r{\textbackslash}n}, equivalent to \texttt{{\textbackslash}x0d{\textbackslash}x0a}).
   The same \textbf{line separator} must be used throughout the \textbf{file}.
 \end{description}
 
@@ -283,7 +283,7 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
   In \ac{BED} \textbf{file}s with fewer than 7~\textbf{field}s, the whole~\textbf{feature} has thick display.
   In \textbf{BED7+}~\textbf{file}s, to achieve the same effect, set \textsf{thickStart}~equal to~\textsf{chromStart} and \textsf{thickEnd}~equal to~\textsf{chromEnd}.
   If this~\textbf{field} is not specified but \textsf{thickStart}~is, then the entire~\textbf{feature} has thick display.
-  For \textbf{BED7+} \textbf{file}s that are not \textbf{BED8+}, the default value is the value of \textsf{chromEnd} - \textsf{chromStart}.
+  For \textbf{BED7+} \textbf{file}s that are not \textbf{BED8+}, the default value is the value of $\textsf{chromEnd} - \textsf{chromStart}$.
 
 \item \textsf{itemRgb}: A triple of integers that determines the color of this~\textbf{feature} when visualized.
   The triple is three integers separated by commas.
@@ -388,7 +388,8 @@ Each custom \textbf{field} should contain either one of several specified data t
       \midrule
       Integer & Decimal string representation of 64-bit signed integer \\
       Unsigned & Decimal string representation of 64-bit unsigned integer \\
-      Float & Decimal string representation of 64-bit floating point number\footnote{\emph{IEEE Standard for Binary Floating-Point Arithmetic.} IEEE 754--1985, 1985} \\
+      Float & Decimal string representation of 64-bit floating point number\footnote{\emph{IEEE Standard for Binary Floating-Point Arithmetic.}
+              IEEE 754--1985, 1985} \\
       Character & One character, other than tab \\
       String & One or more characters, other than tab \\
       \bottomrule
@@ -431,7 +432,10 @@ If a~\textbf{file} intended for visualization is over \SI{50}{\mebi\byte} in siz
 The~\texttt{bedToBigBed} program may perform this conversion.\footnote{``bigBed Track Format.''
   \Ac{UCSC} Genome Browser FAQ, \url{https://genome.ucsc.edu/goldenPath/help/bigBed.html}}
 
-Tabix is another option for storing larger \ac{BED} \textbf{file}s.\footnote{Li H. (2011). ``Tabix: fast retrieval of sequence features from generic TAB-delimited files.'' \emph{Bioinformatics}, 27(5):718--719. \url{https://doi.org/10.1093/bioinformatics/btq671}}
+Tabix is another option for storing larger \ac{BED} \textbf{file}s.\footnote{Li H.
+  (2011) ``Tabix: fast retrieval of sequence features from generic TAB-delimited files.''
+  \emph{Bioinformatics} 27(5):718--719.
+  \url{https://doi.org/10.1093/bioinformatics/btq671}}
 Tabix works only on \textbf{file}s using a single tab as the \textbf{field separator}.
 
 \section{Information supplied out-of-band}
@@ -461,7 +465,7 @@ To distinguish between \ac{BED} \textbf{file}s and track files, track files shou
 \section{Acronyms}
 
 % using the optional argument to acronym to set the label width causes it to use the list environment instead of description, which means we can't set nosep easily
-\setlist[description]{labelwidth=\widthof{\textbf{GA4GH}},nosep}
+\setlist[description]{labelwidth=\widthof{\textbf{\acs{GA4GH}}},nosep}
 \begin{acronym}
   \acro{ASCII}{American Standard Code for Information Interchange}
   \acro{BED}{Browser Extensible Data}
@@ -475,7 +479,7 @@ To distinguish between \ac{BED} \textbf{file}s and track files, track files shou
 \section{Acknowledgments}
 
 We thank W.~James Kent and the \ac{UCSC} Genome Browser team for creating the \ac{BED} format.
-We thank W.~James Kent and Hiram Clawson~(\ac{UCSC}); Eric Roberts~(University Health Network); John Marshall~(University of Glasgow); Aaron R.~Quinlan and Brent S.~Pedersen~(University of Utah); Ting Wang~(Washington University in St.~Louis); Daniel Perrett and Simon Brent (Wellcome Sanger Institute); Jasper Saris (Erasmus Medical Center); Zhenyu Zhang (University of Chicago); Andrew Yates and Susan Fairley (\ac{EMBL}---European Bioinformatics Institute); Michael Schatz (Johns Hopkins University); Igor Dolgalev (New York University); Colin Diesh (University of California, Berkeley); Alex Reynolds (Altius Institute for Biomedical Sciences); Junjun Zhang (Ontario Institute for Cancer Research); and the \ac{GA4GH} File Formats Task Team for comments on this specification.
+We thank W.~James Kent and Hiram Clawson~(\ac{UCSC}); Eric Roberts~(University Health Network); John Marshall~(University of Glasgow); Aaron R.~Quinlan and Brent S.~Pedersen~(University of Utah); Ting Wang~(Washington University in St.~Louis); Daniel Perrett and Simon Brent~(Wellcome Sanger Institute); Jasper Saris~(Erasmus Medical Center); Zhenyu Zhang (University of Chicago); Andrew Yates~(\ac{EMBL}---European Bioinformatics Institute); Michael Schatz~(Johns Hopkins University); Igor Dolgalev (New York University); Colin Diesh~(University of California, Berkeley); Alex Reynolds~(Altius Institute for Biomedical Sciences); Junjun Zhang~(Ontario Institute for Cancer Research); and the \ac{GA4GH} File Formats Task Team for comments on this specification.
 
 \end{document}
 
