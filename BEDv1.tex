@@ -140,7 +140,7 @@ This document uses several typographic conventions~(\autoref{tab:typographic-con
 \item[field:]
   Data stored as non-tab text.
   All~\textbf{field}s are 7-bit US \ac{ASCII} printable characters\footnote{Characters in the range \texttt{{\textbackslash}x20} to \texttt{{\textbackslash}x7e}, therefore not including any control characters}.
-  Only some \textbf{field}s can be empty, and they can only be empty when a single tab is used as the \textbf{field separator}.
+  Only custom \textbf{field}s can be empty, and they can only be empty when a single tab is used as the \textbf{field separator} throughout the \textbf{file}.
 
 \item[field separator:]
   One or more horizontal whitespace characters (space or tab).
@@ -181,10 +181,11 @@ They may appear in any quantity.
 
 \subsection{\acs{BED} fields}
 
-Each~\textbf{data line} contains between~3 and 12~~\textbf{field}s delimited by a \textbf{field separator}.
+Each~\textbf{data line} contains between~3 and 12~\textbf{field}s delimited by a \textbf{field separator}.
 The first 3~\textbf{field}s are mandatory, and the last 9~\textbf{field}s are optional~(\autoref{tab:fields}).
 In optional~\textbf{field}s, the order is binding---if a \textbf{field} is filled, then all previous~\textbf{field}s must also be filled.
-However, \textbf{BED10} and \textbf{BED11} are prohibited.
+These 12~\textbf{fields} may not be empty.
+\textbf{BED10} and \textbf{BED11} are prohibited.
 
 \begin{savenotes}
   \begin{table}
@@ -255,7 +256,6 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
 
 \item \textsf{name}: String that describes the~\textbf{feature}.
   \textsf{name} must be~1 to 255~non-tab characters.
-  \textsf{name} must not be empty.
   \textsf{name} must not contain whitespace, unless the only \textbf{field separator} is a single tab.
   Multiple \textbf{data line}s may share the same \textsf{name}.
   In \textbf{BED5+} \textbf{file}s where all \textbf{features} have uninformative \textsf{name}s, dot~(\texttt{.}) may be used as a \textsf{name} on every \textbf{data line}.
@@ -268,7 +268,6 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
 \item \textsf{strand}: Strand that the~\textbf{feature} appears on.
   The \textsf{strand} may either refer to the~\texttt{+}~(sense or coding) strand or the~\texttt{-}~(antisense or complementary) strand.
   If the \textbf{feature} has no \textsf{strand} information or unknown \textsf{strand}, then a dot~(\texttt{.}) must be used as an uninformative value.
-  \textsf{strand} cannot be empty in \textbf{BED6+} \textbf{file}s.
   \textsf{strand} should be treated as \texttt{.} when parsing files that are not \textbf{BED6+}.
 \end{enumerate}
 
@@ -285,7 +284,7 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
   In \textbf{BED8+} \textbf{file}s where all \textbf{feature}s have uninformative \textsf{thickEnd}s, the value of \textsf{chromEnd} should be used as the \textsf{thickEnd} on every \textbf{data line}.
   In \ac{BED} \textbf{file}s that are not \textbf{BED7+}, the whole~\textbf{feature} has thick display.
   In \textbf{BED7+}~\textbf{file}s, to achieve the same effect, set \textsf{thickStart}~equal to~\textsf{chromStart} and \textsf{thickEnd}~equal to~\textsf{chromEnd}.
-  If this~\textbf{field} is not specified but \textsf{thickStart}~is, then the entire~\textbf{feature} has thick display.
+  If \textsf{thickEnd} is not specified but \textsf{thickStart}~is, then the entire~\textbf{feature} has thick display.
 
 \item \textsf{itemRgb}: A triple of integers that determines the color of this~\textbf{feature} when visualized.
   The triple is three integers separated by commas.
@@ -302,14 +301,12 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
 \item \textsf{blockCount}: Number of~\textbf{block}s in the~\textbf{feature}.
   \textsf{blockCount}~must be an integer greater than 0.
   \textsf{blockCount}~is mandatory in~\textbf{BED12+}~\textbf{file}s.
-  Empty~\textsf{blockCount} are not allowed, because~\textsf{blockSizes} and~\textsf{blockStarts} rely on~\textsf{blockCount}.
   A visual representation of the \ac{BED} format may have blocks appear thicker than the rest of the~\textbf{feature}.
 
 \item \textsf{blockSizes}: Comma-separated list of length~\textsf{blockCount} containing the size of each~\textbf{block}.
   There must be no spaces before or after commas.
   There may be a trailing comma after the last element of the list.
   \textsf{blockSizes}~is mandatory in \textbf{BED12+} \textbf{file}s.
-  Empty~\textsf{blockSizes} is not allowed, because \textsf{blockStarts}~cannot be verified without~\textsf{blockSizes}.
 
 \item \textsf{blockStarts}: Comma-separated list of length~\textsf{blockCount} containing each \textbf{block}'s~start position, relative to~\textsf{chromStart}.
   There must not be spaces before or after the commas.
@@ -322,7 +319,6 @@ The positions in \ac{BED}~\textbf{field}s are all described in the~\textbf{0-bas
   Moreover, the~\textbf{block}s must not overlap.
   The list must be sorted in ascending order.
   \textsf{blockStarts}~is mandatory in~\textbf{BED12+} \textbf{file}s.
-  Empty~\textsf{blockStarts} is not allowed.
 \end{enumerate}
 
 \section{Examples}
@@ -365,8 +361,7 @@ The last~\textbf{block} ends at~\textsf{chromEnd} since the last~\textbf{block} 
 
 \subsection{Optional fields}\label{sec:optional}
 \begin{itemize}
-\item \textsf{name}: In the absence of out-of-band information about whether a single tab is the only \textbf{field separator} in the file, if a \textbf{feature} has no name, then a dot~(\texttt{.}) should be used.
-  Names should avoid using the space character even if the only \textbf{field separator} is a single tab character, because parsers may interpret a space as a \textbf{field separator}.
+\item \textsf{name}: Names should avoid using the space character even if the only \textbf{field separator} is a single tab character, because parsers may interpret a space as a \textbf{field separator}.
 
 \item \textsf{itemRgb}: Eight or fewer colors should be used as too many colors may slow down visualizations and are difficult for humans to distinguish.\footnote{``Frequently
     Asked Questions: Data File Formats.'' \ac{UCSC} Genome Browser FAQ,
