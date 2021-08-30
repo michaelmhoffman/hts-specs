@@ -184,7 +184,7 @@ They may appear in any quantity.
 Each~\textbf{data line} contains between~3 and 12~\textbf{field}s delimited by a \textbf{field separator}.
 The first 3~\textbf{field}s are mandatory, and the last 9~\textbf{field}s are optional~(\autoref{tab:fields}).
 In optional~\textbf{field}s, the order is binding---if a \textbf{field} is filled, then all previous~\textbf{field}s must also be filled.
-These 12~\textbf{fields} may not be empty.
+Any mandatory or optional \textbf{field} included on any \textbf{data line} in the \textbf{file} must not be empty on any other \textbf{data line}.
 \textbf{BED10} and \textbf{BED11} are prohibited.
 
 \begin{savenotes}
